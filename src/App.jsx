@@ -12,6 +12,8 @@ import MainLayout from './components/layouts/MainLayout';
 // Pages
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/auth/LoginPage';
+import RegisterPage from './pages/auth/RegisterPage';
+import PricingPage from './pages/PricingPage';
 import OnboardingPage from './pages/onboarding/OnboardingPage';
 import DashboardPage from './pages/dashboard/DashboardPage';
 import CourseCatalogPage from './pages/learn/CourseCatalogPage';
@@ -21,6 +23,7 @@ import DiagnosisPage from './pages/learn/DiagnosisPage';
 import ProfilePage from './pages/social/ProfilePage';
 import EditProfilePage from './pages/social/EditProfilePage';
 import SocialFeedPage from './pages/social/SocialFeedPage';
+import FriendDiscoveryPage from './pages/social/FriendDiscoveryPage';
 import AboutPage from './pages/info/AboutPage';
 import PrivacyPage from './pages/info/PrivacyPage';
 import TermsPage from './pages/info/TermsPage';
@@ -33,7 +36,8 @@ function App() {
           {/* Public Routes */}
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/pricing" element={<PricingPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/privacy" element={<PrivacyPage />} />
           <Route path="/terms" element={<TermsPage />} />
@@ -54,6 +58,7 @@ function App() {
             <Route path="/exercises/:exerciseId" element={<ExercisePage />} />
             <Route path="/diagnosis/:moduleId" element={<DiagnosisPage />} />
             <Route path="/social" element={<SocialFeedPage />} />
+            <Route path="/social/discover" element={<FriendDiscoveryPage />} />
             <Route path="/profile/:userId" element={<ProfilePage />} />
             <Route path="/profile" element={<ProfilePage />} />
             <Route path="/profile/edit" element={<EditProfilePage />} />

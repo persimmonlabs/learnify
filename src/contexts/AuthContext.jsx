@@ -6,6 +6,14 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { STORAGE_KEYS } from '../config/constants';
+import {
+  canEnrollInCourse as checkCanEnroll,
+  validateEnrollment,
+  getEnrollmentStatus,
+  getRemainingCourses,
+  getSubscriptionBenefits,
+  shouldShowUpgradePrompt,
+} from '../utils/subscriptionHelpers';
 
 const AuthContext = createContext(null);
 
@@ -98,6 +106,86 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Subscription-related methods
+
+  /**
+   * Check if user can enroll in more courses
+   * @returns {boolean} True if user has available course slots
+   */
+  const canEnrollInCourse = () => {
+    return checkCanEnroll(user);
+  };
+
+  /**
+   * Enroll user in a course
+   * @param {string} courseId - Course ID to enroll in
+   * @returns {object} Result object with success flag and optional error
+   */
+  const enrollInCourse = async (courseId) => {
+    // Validate enrollment attempt
+    const validation = validateEnrollment(user, courseId);
+    if (!validation.success) {
+      return validation;
+    }
+
+    try {
+      // Call API to enroll
+      const response = await api.enrollInCourse(courseId);
+
+      if (response.success) {
+        // Update local user state
+        const updatedEnrolledCourses = [...(user.enrolledCourses || []), courseId];
+        const updatedCoursesUsed = (user.coursesUsedThisMonth || 0) + 1;
+
+        updateUser({
+          enrolledCourses: updatedEnrolledCourses,
+          coursesUsedThisMonth: updatedCoursesUsed,
+        });
+
+        return {
+          success: true,
+          data: {
+            courseId,
+            remainingSlots: user.courseLimit - updatedCoursesUsed,
+          },
+        };
+      }
+
+      return {
+        success: false,
+        error: response.message || 'Enrollment failed',
+      };
+    } catch (error) {
+      console.error('Enrollment error:', error);
+      return {
+        success: false,
+        error: error.message || 'Enrollment failed',
+      };
+    }
+  };
+
+  /**
+   * Get subscription information for current user
+   * @returns {object} Subscription details including tier, limits, and benefits
+   */
+  const getSubscriptionInfo = () => {
+    if (!user) {
+      return null;
+    }
+
+    return {
+      tier: user.subscriptionTier,
+      courseLimit: user.courseLimit,
+      coursesUsed: user.coursesUsedThisMonth || 0,
+      remaining: getRemainingCourses(user),
+      renewsOn: user.subscriptionRenewsOn,
+      benefits: getSubscriptionBenefits(user.subscriptionTier),
+      canEnroll: checkCanEnroll(user),
+      shouldShowUpgrade: shouldShowUpgradePrompt(user),
+      enrollmentStatus: getEnrollmentStatus(user),
+    };
+  };
+
   const value = {
     user,
     loading,
@@ -107,6 +195,10 @@ export const AuthProvider = ({ children }) => {
     logout,
     updateUser,
     completeOnboarding,
+    // Subscription methods
+    canEnrollInCourse,
+    enrollInCourse,
+    getSubscriptionInfo,
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

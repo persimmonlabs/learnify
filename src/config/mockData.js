@@ -4,6 +4,7 @@
  */
 
 import { ARCHETYPES, LANGUAGES, DIFFICULTY_LEVELS, SKILL_LEVELS } from './constants';
+import { SUBSCRIPTION_TIERS } from './pricing';
 
 // Mock User Data
 export const mockUser = {
@@ -19,6 +20,15 @@ export const mockUser = {
   xpToNextLevel: 500,
   avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex',
   joinedDate: '2024-01-15',
+
+  // Subscription fields
+  subscriptionTier: SUBSCRIPTION_TIERS.PLUS,
+  coursesUsedThisMonth: 2,
+  courseLimit: 6,
+  subscriptionRenewsOn: '2025-12-21',
+  enrolledCourses: ['course-1', 'course-2'],
+  completedCourses: ['course-3'],
+
   badges: [
     { id: 'badge-1', name: 'First Steps', icon: '🎯', earned: true },
     { id: 'badge-2', name: 'Code Warrior', icon: '⚔️', earned: true },

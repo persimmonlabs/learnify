@@ -307,6 +307,18 @@ export const api = {
     }
   },
 
+  enrollInCourse: async (courseId) => {
+    try {
+      return await apiClient.post(buildUrl(API_ENDPOINTS.ENROLL_COURSE, { id: courseId }));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        message: 'Failed to enroll in course',
+      };
+    }
+  },
+
   // Exercises
   getExercise: async (exerciseId) => {
     try {
@@ -427,6 +439,94 @@ export const api = {
         success: false,
         error: error.message,
         data: { trending: [] },
+      };
+    }
+  },
+
+  // Friends
+  searchUsers: async (query) => {
+    try {
+      const url = buildUrl(API_ENDPOINTS.SEARCH_USERS);
+      const queryParams = new URLSearchParams({ q: query }).toString();
+
+      return await apiClient.get(`${url}?${queryParams}`);
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        data: { users: [] },
+      };
+    }
+  },
+
+  sendFriendRequest: async (userId) => {
+    try {
+      return await apiClient.post(buildUrl(API_ENDPOINTS.SEND_FRIEND_REQUEST, { id: userId }));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        message: 'Failed to send friend request',
+      };
+    }
+  },
+
+  acceptFriendRequest: async (requestId) => {
+    try {
+      return await apiClient.post(buildUrl(API_ENDPOINTS.ACCEPT_FRIEND_REQUEST, { id: requestId }));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        message: 'Failed to accept friend request',
+      };
+    }
+  },
+
+  declineFriendRequest: async (requestId) => {
+    try {
+      return await apiClient.delete(buildUrl(API_ENDPOINTS.DECLINE_FRIEND_REQUEST, { id: requestId }));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        message: 'Failed to decline friend request',
+      };
+    }
+  },
+
+  getFriends: async () => {
+    try {
+      return await apiClient.get(buildUrl(API_ENDPOINTS.GET_FRIENDS));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        data: { friends: [] },
+      };
+    }
+  },
+
+  getPendingRequests: async () => {
+    try {
+      return await apiClient.get(buildUrl(API_ENDPOINTS.GET_PENDING_REQUESTS));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        data: { requests: [] },
+      };
+    }
+  },
+
+  removeFriend: async (friendshipId) => {
+    try {
+      return await apiClient.delete(buildUrl(API_ENDPOINTS.REMOVE_FRIEND, { id: friendshipId }));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        message: 'Failed to remove friend',
       };
     }
   },

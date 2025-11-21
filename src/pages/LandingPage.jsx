@@ -19,20 +19,9 @@ import { ArrowRight, Check, Target, Zap, Users, Sparkles } from 'lucide-react';
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const [learningGoal, setLearningGoal] = useState('');
 
-  const handleStart = () => {
-    if (learningGoal.trim()) {
-      navigate('/login', { state: { learningGoal: learningGoal.trim() } });
-    } else {
-      navigate('/login');
-    }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-      handleStart();
-    }
+  const handleExploreCourses = () => {
+    navigate('/courses');
   };
 
   // Navigation links
@@ -89,8 +78,8 @@ const LandingPage = () => {
               {/* Headline */}
               <div className="animate-in" style={{ animationDelay: '100ms' }}>
                 <Text as="h1" variant="display-xl" className="mb-8 max-w-4xl mx-auto leading-[1.1]">
-                  What do you want to <br className="hidden md:block" />
-                  <GradientText animate>learn?</GradientText>
+                  Master New Skills Through <br className="hidden md:block" />
+                  <GradientText animate>Expert-Curated Courses</GradientText>
                 </Text>
               </div>
 
@@ -101,44 +90,24 @@ const LandingPage = () => {
                 className="max-w-2xl mx-auto mb-12 animate-in"
                 style={{ animationDelay: '200ms' }}
               >
-                AI builds your personal curriculum using <strong className="text-slate-900">your obsession</strong>.
-                Learn coding through sneakers. Finance through tennis. Music theory through trading. Any skill, taught
-                through what you actually care about.
+                Discover professionally crafted learning paths designed by industry experts.
+                Build real-world skills with structured, high-quality courses tailored to
+                help you succeed in your learning journey.
               </Text>
 
-              {/* Learning Goal Input - Beautiful with glow effect */}
-              <div className="w-full max-w-2xl mx-auto relative group animate-in" style={{ animationDelay: '300ms' }}>
+              {/* CTA Button - Prominent with glow effect */}
+              <div className="w-full max-w-md mx-auto relative group animate-in" style={{ animationDelay: '300ms' }}>
                 <div className="absolute -inset-1 bg-gradient-to-r from-prism-blue-400 via-prism-green-400 to-prism-orange-400 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-500" />
-                <div className="relative bg-white rounded-2xl p-3 shadow-2xl shadow-prism-blue-900/5 border border-slate-100">
-                  <textarea
-                    value={learningGoal}
-                    onChange={(e) => setLearningGoal(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    placeholder="Type anything... Examples: SQL for tennis analytics • Build a trading bot • Design systems for games"
-                    className="w-full px-4 py-4 text-base border-0 focus:ring-0 outline-none resize-none rounded-xl"
-                    rows={3}
-                  />
-                  <div className="flex items-center justify-between px-2 pt-2">
-                    <Text variant="caption" color="light" className="text-xs">
-                      {learningGoal.length > 0 ? (
-                        <>
-                          {learningGoal.length} characters · Press{' '}
-                          <kbd className="px-1.5 py-0.5 bg-slate-100 rounded text-xs">⌘Enter</kbd> to continue
-                        </>
-                      ) : (
-                        'No limit—write as much as you want'
-                      )}
-                    </Text>
-                    <Button
-                      variant="primary"
-                      size="md"
-                      onClick={handleStart}
-                      rightIcon={<ArrowRight size={16} />}
-                      className="shrink-0"
-                    >
-                      {learningGoal.trim() ? 'Start Journey' : 'Skip'}
-                    </Button>
-                  </div>
+                <div className="relative">
+                  <Button
+                    variant="primary"
+                    size="xl"
+                    onClick={handleExploreCourses}
+                    rightIcon={<ArrowRight size={20} />}
+                    className="w-full shadow-2xl shadow-prism-blue-900/20 hover:shadow-prism-blue-900/30 transition-all duration-300"
+                  >
+                    Explore Our Courses
+                  </Button>
                 </div>
 
                 <Text variant="caption" className="mt-4 flex items-center justify-center gap-2">
@@ -154,41 +123,41 @@ const LandingPage = () => {
           <Container size="xl">
             <div className="text-center mb-16">
               <Text variant="display-md" as="h2" className="mb-4">
-                Any skill. Your passion.
+                Comprehensive Learning Paths
               </Text>
               <Text variant="body-lg" color="muted" className="max-w-2xl mx-auto">
-                We don't teach with boring examples. We rewrite every lesson using what you're obsessed with.
+                Expert-designed courses across multiple disciplines, structured to take you from beginner to proficient.
               </Text>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[
                 {
-                  emoji: '👟',
-                  title: 'The Sneaker Allocator',
-                  skill: 'Learn investing',
-                  through: 'your sneaker collection',
+                  emoji: '💼',
+                  title: 'Business & Finance',
+                  skill: 'Master investing',
+                  through: 'structured curriculum',
                   color: 'from-orange-500 to-red-500',
                 },
                 {
-                  emoji: '🎾',
-                  title: 'The Tennis Analyst',
-                  skill: 'Learn SQL & data',
-                  through: 'your tennis stats',
+                  emoji: '💻',
+                  title: 'Data & Analytics',
+                  skill: 'Master SQL & data',
+                  through: 'hands-on projects',
                   color: 'from-green-500 to-emerald-500',
                 },
                 {
-                  emoji: '🎵',
-                  title: 'The Beat Architect',
-                  skill: 'Learn algorithms',
-                  through: 'music production',
+                  emoji: '🎨',
+                  title: 'Design & Creativity',
+                  skill: 'Master design systems',
+                  through: 'real-world examples',
                   color: 'from-purple-500 to-pink-500',
                 },
                 {
-                  emoji: '🍳',
-                  title: 'The Recipe Engineer',
-                  skill: 'Learn systems design',
-                  through: 'cooking processes',
+                  emoji: '⚙️',
+                  title: 'Engineering & Systems',
+                  skill: 'Master architecture',
+                  through: 'proven frameworks',
                   color: 'from-blue-500 to-cyan-500',
                 },
               ].map((persona) => (
@@ -223,22 +192,22 @@ const LandingPage = () => {
               <FeatureCard
                 icon={<Target size={28} />}
                 iconVariant="blue"
-                title="100% Personalized"
-                description="Every lesson rewrites itself for YOUR domain. No generic tutorials. No abstract examples. Just learning through what you love."
+                title="Expert-Curated Content"
+                description="Professionally designed courses by industry leaders. High-quality curriculum built on proven learning methodologies and best practices."
               />
 
               <FeatureCard
                 icon={<Zap size={28} />}
                 iconVariant="orange"
-                title="Build Real Systems"
-                description="No toy problems. You'll architect actual systems from day one. Each module gives you working tools you can use immediately."
+                title="Structured Learning Paths"
+                description="Progress through carefully sequenced modules. Each course is designed to build your skills systematically from fundamentals to advanced topics."
               />
 
               <FeatureCard
                 icon={<Users size={28} />}
                 iconVariant="green"
-                title="Learn With Others"
-                description="See what your network is mastering. Data-driven progress that inspires without the social media noise."
+                title="Learn With Community"
+                description="Join a vibrant learning community. Track your progress and connect with fellow learners on similar paths."
               />
             </div>
           </Container>
@@ -266,10 +235,10 @@ const LandingPage = () => {
                 </div>
                 <div className="space-y-4">
                   {[
-                    'Generic examples (Foo, Bar, widgets)',
-                    'Memorize syntax first',
-                    'Toy problems that feel pointless',
-                    'Learn alone in silence',
+                    'Generic, one-size-fits-all content',
+                    'Disorganized learning materials',
+                    'No clear progression path',
+                    'Limited expert guidance',
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <div className="w-5 h-5 rounded-full bg-slate-200 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -296,10 +265,10 @@ const LandingPage = () => {
                 </div>
                 <div className="space-y-4">
                   {[
-                    'YOUR examples (sneakers, tennis, music)',
-                    'Diagnose real systems immediately',
-                    'Build tools you will actually use',
-                    'Learn with a network that inspires',
+                    'Expert-curated, high-quality courses',
+                    'Structured learning progression',
+                    'Proven frameworks and methodologies',
+                    'Supportive learning community',
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-3">
                       <div className="w-5 h-5 rounded-full bg-prism-green-500 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -324,7 +293,7 @@ const LandingPage = () => {
                 How It Works
               </Text>
               <Text variant="body-lg" color="muted">
-                Three steps to your personalized learning path
+                Three simple steps to start your learning journey
               </Text>
             </div>
 
@@ -332,18 +301,18 @@ const LandingPage = () => {
               {[
                 {
                   step: '1',
-                  title: 'Tell us what you want to master',
-                  description: 'Type anything - "SQL", "investing", "music theory", "design systems"',
+                  title: 'Browse our course catalog',
+                  description: 'Explore professionally curated courses across multiple disciplines and skill levels',
                 },
                 {
                   step: '2',
-                  title: "Share what you're obsessed with",
-                  description: 'Your sneaker collection, tennis stats, cooking recipes, trading strategies',
+                  title: 'Choose your learning path',
+                  description: 'Select courses that match your goals and start building real-world skills',
                 },
                 {
                   step: '3',
-                  title: 'AI builds your custom curriculum',
-                  description: 'Every lesson rewrites itself using YOUR domain and passion',
+                  title: 'Learn and grow',
+                  description: 'Follow structured lessons, complete projects, and track your progress',
                 },
               ].map((item) => (
                 <div key={item.step} className="text-center">
@@ -367,13 +336,13 @@ const LandingPage = () => {
           <Container size="lg">
             <div className="text-center">
               <Text variant="display-lg" as="h2" className="mb-6">
-                Learn anything through anything
+                Start Your Learning Journey Today
               </Text>
               <Text variant="body-xl" color="muted" className="mb-8 max-w-2xl mx-auto">
-                The first learning platform that adapts to you, not the other way around
+                Join thousands of learners mastering new skills with expert-curated courses
               </Text>
-              <Button variant="primary" size="xl" onClick={handleStart} rightIcon={<ArrowRight size={20} />}>
-                Get Started Now
+              <Button variant="primary" size="xl" onClick={handleExploreCourses} rightIcon={<ArrowRight size={20} />}>
+                Explore Courses
               </Button>
               <Text variant="caption" color="muted" className="mt-4">
                 Free to start · No credit card required
@@ -386,7 +355,7 @@ const LandingPage = () => {
       {/* Footer */}
       <Footer
         linkGroups={footerLinks}
-        description="The first learning platform that adapts to you, not the other way around. Built with ❤️."
+        description="Master new skills with expert-curated courses designed for success. Built with care."
       />
     </div>
   );

@@ -1,6 +1,6 @@
 /**
- * Login Page
- * User authentication page
+ * Register Page
+ * User registration page with authentication redirect flow
  */
 
 import React, { useState } from 'react';
@@ -11,7 +11,7 @@ import Button from '../../components/atoms/Button';
 import Input from '../../components/atoms/Input';
 import Text from '../../components/atoms/Text';
 import Alert from '../../components/atoms/Alert';
-import { Mail, Lock } from 'lucide-react';
+import { Mail, Lock, User } from 'lucide-react';
 
 /**
  * Sanitize return URL to prevent open redirect vulnerabilities
@@ -31,19 +31,22 @@ const sanitizeReturnUrl = (url) => {
   return null;
 };
 
-const LoginPage = () => {
+const RegisterPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams] = useSearchParams();
-  const { login } = useAuth();
+  const { register } = useAuth();
 
   // Get return URL from query params or location state
   const returnToParam = searchParams.get('returnTo');
   const learningGoal = location.state?.learningGoal;
   const sanitizedReturnUrl = sanitizeReturnUrl(returnToParam);
+
   const [formData, setFormData] = useState({
+    username: '',
     email: '',
     password: '',
+    confirmPassword: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -61,7 +64,21 @@ const LoginPage = () => {
     setLoading(true);
     setError('');
 
-    const result = await login(formData.email, formData.password);
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
+
+    // Validate password length
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters long');
+      setLoading(false);
+      return;
+    }
+
+    const result = await register(formData.email, formData.password, formData.username);
 
     if (result.success) {
       // Priority 1: Return to intended destination (course enrollment, etc.)
@@ -76,10 +93,10 @@ const LoginPage = () => {
         return;
       }
 
-      // Priority 3: Default to dashboard
-      navigate('/dashboard');
+      // Priority 3: New users should go to onboarding
+      navigate('/onboarding');
     } else {
-      setError(result.error || 'Login failed. Please try again.');
+      setError(result.error || 'Registration failed. Please try again.');
     }
     setLoading(false);
   };
@@ -91,17 +108,17 @@ const LoginPage = () => {
           {/* Header */}
           <div className="text-center mb-8">
             <Text variant="display-md" as="h1" className="mb-2">
-              Welcome Back
+              Create Account
             </Text>
             <Text variant="body-lg" color="muted">
-              Sign in to continue your learning journey
+              Start your learning journey today
             </Text>
           </div>
 
           {/* Error Alert */}
           {error && (
             <div className="mb-6">
-              <Alert variant="error" title="Login Failed">
+              <Alert variant="error" title="Registration Failed">
                 {error}
               </Alert>
             </div>
@@ -109,6 +126,23 @@ const LoginPage = () => {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div>
+              <label htmlFor="username" className="block text-sm font-medium text-slate-700 mb-2">
+                Username
+              </label>
+              <Input
+                id="username"
+                name="username"
+                type="text"
+                placeholder="johndoe"
+                value={formData.username}
+                onChange={handleChange}
+                leftIcon={<User size={20} />}
+                size="lg"
+                required
+              />
+            </div>
+
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-2">
                 Email
@@ -140,47 +174,64 @@ const LoginPage = () => {
                 leftIcon={<Lock size={20} />}
                 size="lg"
                 required
+                minLength={8}
+              />
+              <Text variant="caption" color="muted" className="mt-1">
+                Must be at least 8 characters long
+              </Text>
+            </div>
+
+            <div>
+              <label htmlFor="confirmPassword" className="block text-sm font-medium text-slate-700 mb-2">
+                Confirm Password
+              </label>
+              <Input
+                id="confirmPassword"
+                name="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+                leftIcon={<Lock size={20} />}
+                size="lg"
+                required
+                minLength={8}
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <label className="flex items-center">
-                <input
-                  type="checkbox"
-                  className="rounded border-slate-300 text-prism-blue-600 focus:ring-prism-blue-500"
-                />
-                <span className="ml-2 text-sm text-slate-600">Remember me</span>
+            <div className="flex items-start">
+              <input
+                type="checkbox"
+                id="terms"
+                required
+                className="mt-1 rounded border-slate-300 text-prism-blue-600 focus:ring-prism-blue-500"
+              />
+              <label htmlFor="terms" className="ml-2 text-sm text-slate-600">
+                I agree to the{' '}
+                <Link to="/terms" className="text-prism-blue-600 hover:text-prism-blue-700 font-medium">
+                  Terms of Service
+                </Link>{' '}
+                and{' '}
+                <Link to="/privacy" className="text-prism-blue-600 hover:text-prism-blue-700 font-medium">
+                  Privacy Policy
+                </Link>
               </label>
-              <Link to="/forgot-password" className="text-sm font-medium text-prism-blue-600 hover:text-prism-blue-700">
-                Forgot password?
-              </Link>
             </div>
 
             <Button type="submit" variant="primary" size="xl" fullWidth disabled={loading}>
-              {loading ? 'Signing in...' : 'Sign In'}
+              {loading ? 'Creating account...' : 'Create Account'}
             </Button>
           </form>
 
-          {/* Demo Login */}
-          <div className="mt-6 p-4 bg-prism-blue-50 rounded-xl">
-            <Text variant="caption" color="muted" className="text-center mb-2">
-              Demo credentials
-            </Text>
-            <div className="flex gap-2 text-xs">
-              <code className="flex-1 p-2 bg-white rounded">student@learnify.com</code>
-              <code className="flex-1 p-2 bg-white rounded">password123</code>
-            </div>
-          </div>
-
-          {/* Register Link */}
+          {/* Login Link */}
           <div className="mt-8 text-center">
             <Text variant="body-sm" color="muted">
-              Don't have an account?{' '}
+              Already have an account?{' '}
               <Link
-                to={sanitizedReturnUrl ? `/register?returnTo=${encodeURIComponent(sanitizedReturnUrl)}` : '/register'}
+                to={sanitizedReturnUrl ? `/login?returnTo=${encodeURIComponent(sanitizedReturnUrl)}` : '/login'}
                 className="font-medium text-prism-blue-600 hover:text-prism-blue-700"
               >
-                Sign up
+                Sign in
               </Link>
             </Text>
           </div>
@@ -190,4 +241,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

@@ -142,6 +142,8 @@ export const ROUTES = {
   LESSON: '/courses/:courseId/lessons/:lessonId',
   EXERCISE: '/exercises/:exerciseId',
   DIAGNOSIS: '/diagnosis/:moduleId',
+  SOCIAL: '/social',
+  SOCIAL_DISCOVER: '/social/discover',
   PROFILE: '/profile/:userId',
   SETTINGS: '/settings',
 };
@@ -169,6 +171,7 @@ export const API_ENDPOINTS = {
   COURSES: '/courses',
   COURSE_DETAIL: '/courses/:id',
   COURSE_PROGRESS: '/courses/:id/progress',
+  ENROLL_COURSE: '/courses/:id/enroll',
 
   // Exercises (Protected)
   EXERCISE_DETAIL: '/exercises/:id',
@@ -182,6 +185,10 @@ export const API_ENDPOINTS = {
   RECOMMENDATIONS: '/recommendations',
   USER_PROFILE: '/users/:id/profile',
   ACHIEVEMENTS: '/users/me/achievements',
+  FRIEND_SUGGESTIONS: '/friends/suggestions',
+  SEARCH_USERS: '/users/search',
+  SEND_FRIEND_REQUEST: '/friends/request/:id',
+  ACCEPT_FRIEND_REQUEST: '/friends/accept/:id',
 
   // Public routes
   TRENDING: '/trending',

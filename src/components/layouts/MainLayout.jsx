@@ -7,7 +7,7 @@ import React from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import Navigation from '../organisms/Navigation';
-import { Home, BookOpen, Users, User, LogOut } from 'lucide-react';
+import { Home, BookOpen, Users, User, UserPlus, LogOut } from 'lucide-react';
 
 const MainLayout = () => {
   const navigate = useNavigate();
@@ -17,6 +17,8 @@ const MainLayout = () => {
     { label: 'Dashboard', href: '/dashboard', icon: Home },
     { label: 'Courses', href: '/courses', icon: BookOpen },
     { label: 'Social', href: '/social', icon: Users },
+    { label: 'Discover', href: '/social/discover', icon: UserPlus },
+    { label: 'Pricing', href: '/pricing', icon: null },
     { label: 'Profile', href: `/profile/${user?.id}`, icon: User },
   ];
 

@@ -22,6 +22,9 @@ const CourseCard = ({
   thumbnail,
   icon,
   isNew = false,
+  isEnrolled = false,
+  isAuthenticated = true,
+  canEnroll = true,
   onClick,
   className,
   ...props
@@ -113,7 +116,15 @@ const CourseCard = ({
         {/* CTA */}
         <div className="flex items-center justify-between pt-4 border-t border-slate-100">
           <span className="text-sm font-semibold text-prism-blue-600">
-            {progress > 0 ? 'Continue Learning' : 'Start Course'}
+            {!isAuthenticated
+              ? 'Sign in to Enroll'
+              : isEnrolled
+              ? progress > 0
+                ? 'Continue Learning'
+                : 'Start Course'
+              : !canEnroll
+              ? 'Upgrade Required'
+              : 'Enroll Now'}
           </span>
           <ChevronRight size={20} className="text-prism-blue-600 group-hover:translate-x-1 transition-transform" />
         </div>
