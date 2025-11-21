@@ -10,7 +10,7 @@ import { api } from '../../services/api';
 import { mockFriends, mockCourses, mockUser } from '../../config/mockData';
 import Container from '../../components/atoms/Container';
 import Text from '../../components/atoms/Text';
-import Tabs from '../../components/atoms/Tabs';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '../../components/atoms/Tabs';
 import Spinner from '../../components/atoms/Spinner';
 import SearchBar from '../../components/molecules/SearchBar';
 import DiscoveryCard from '../../components/molecules/DiscoveryCard';
