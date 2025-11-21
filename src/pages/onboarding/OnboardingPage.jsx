@@ -30,8 +30,8 @@ const OnboardingPage = () => {
       navigate('/dashboard');
     } else {
       console.error('Onboarding failed:', result.error);
-      // Still navigate to dashboard even if API call fails (mock environment)
-      navigate('/dashboard');
+      // Show error to user instead of auto-navigating
+      alert(`Onboarding failed: ${result.error || 'Unknown error'}. Please try again.`);
     }
   };
 

@@ -1,25 +1,10 @@
 /**
  * API Service Layer
  * Handles all HTTP requests to the backend
- * Mock implementation for development
+ * Real HTTP implementation for production
  */
 
 import { API_BASE_URL, API_ENDPOINTS, STORAGE_KEYS } from '../config/constants';
-import {
-  mockUser,
-  mockStats,
-  mockCourses,
-  mockModules,
-  mockLesson,
-  mockExercise,
-  mockActivityFeed,
-  mockRecommendations,
-  mockCategories,
-  mockFriends,
-} from '../config/mockData';
-
-// Simulate network delay
-const delay = (ms = 500) => new Promise((resolve) => setTimeout(resolve, ms));
 
 // Get auth token from localStorage
 const getAuthToken = () => {
@@ -46,279 +31,195 @@ const buildUrl = (endpoint, params = {}) => {
   return url;
 };
 
-// Mock HTTP client
-class MockApiClient {
-  async get(url, options = {}) {
-    await delay();
-    console.log('GET', url, options);
-    return this.mockResponse(url, 'GET');
-  }
-
-  async post(url, data, options = {}) {
-    await delay();
-    console.log('POST', url, data, options);
-    return this.mockResponse(url, 'POST', data);
-  }
-
-  async patch(url, data, options = {}) {
-    await delay();
-    console.log('PATCH', url, data, options);
-    return this.mockResponse(url, 'PATCH', data);
-  }
-
-  async delete(url, options = {}) {
-    await delay();
-    console.log('DELETE', url, options);
-    return this.mockResponse(url, 'DELETE');
-  }
-
-  mockResponse(url, method, data = null) {
-    // Auth endpoints
-    if (url.includes('/auth/register')) {
-      return {
-        success: true,
-        data: {
-          user: mockUser,
-          token: 'mock-jwt-token-' + Date.now(),
-        },
-        message: 'Registration successful',
-      };
-    }
-
-    if (url.includes('/auth/login')) {
-      return {
-        success: true,
-        data: {
-          user: mockUser,
-          token: 'mock-jwt-token-' + Date.now(),
-        },
-        message: 'Login successful',
-      };
-    }
-
-    // User endpoints
-    if (url.includes('/users/me') && method === 'GET') {
-      return {
-        success: true,
-        data: mockUser,
-      };
-    }
-
-    if (url.includes('/users/me') && method === 'PATCH') {
-      return {
-        success: true,
-        data: { ...mockUser, ...data },
-        message: 'Profile updated successfully',
-      };
-    }
-
-    if (url.includes('/onboarding/complete')) {
-      return {
-        success: true,
-        data: {
-          user: { ...mockUser, onboardingCompleted: true },
-          recommendedCourse: mockCourses[0],
-        },
-        message: 'Onboarding completed',
-      };
-    }
-
-    // Course endpoints
-    if (url.includes('/courses') && !url.match(/\/courses\/[\w-]+/)) {
-      return {
-        success: true,
-        data: {
-          courses: mockCourses,
-          total: mockCourses.length,
-          page: 1,
-          perPage: 12,
-        },
-      };
-    }
-
-    if (url.match(/\/courses\/[\w-]+$/) && !url.includes('/progress')) {
-      return {
-        success: true,
-        data: {
-          ...mockCourses[0],
-          modules: mockModules,
-          syllabus: mockModules,
-        },
-      };
-    }
-
-    if (url.includes('/progress')) {
-      return {
-        success: true,
-        data: {
-          courseId: 'course-1',
-          progress: 65,
-          completedModules: 1,
-          totalModules: 3,
-          lastAccessedLesson: 'lesson-2-1',
-        },
-      };
-    }
-
-    // Exercise endpoints
-    if (url.match(/\/exercises\/[\w-]+$/) && method === 'GET') {
-      return {
-        success: true,
-        data: mockExercise,
-      };
-    }
-
-    if (url.includes('/exercises') && url.includes('/submit')) {
-      return {
-        success: true,
-        data: {
-          submissionId: 'submission-' + Date.now(),
-          status: 'passed',
-          passedTests: 8,
-          totalTests: 10,
-          score: 80,
-          feedback: 'Good work! Consider edge cases.',
-          testResults: [
-            {
-              name: 'Test Case 1',
-              passed: true,
-              runtime: 12,
-              message: 'Passed',
-            },
-            {
-              name: 'Test Case 2',
-              passed: false,
-              runtime: 8,
-              message: 'Expected 0 but got null',
-            },
-          ],
-        },
-        message: 'Exercise submitted successfully',
-      };
-    }
-
-    if (url.includes('/submissions') && url.includes('/review')) {
-      return {
-        success: true,
-        data: {
-          reviewId: 'review-' + Date.now(),
-          status: 'pending',
-          estimatedTime: '2-3 minutes',
-        },
-        message: 'Review requested',
-      };
-    }
-
-    // Social endpoints
-    if (url.includes('/feed')) {
-      return {
-        success: true,
-        data: {
-          activities: mockActivityFeed,
-          hasMore: false,
-        },
-      };
-    }
-
-    if (url.includes('/recommendations')) {
-      return {
-        success: true,
-        data: {
-          recommendations: mockRecommendations,
-          categories: mockCategories,
-        },
-      };
-    }
-
-    if (url.includes('/follow') && method === 'POST') {
-      return {
-        success: true,
-        message: 'User followed successfully',
-      };
-    }
-
-    if (url.includes('/follow') && method === 'DELETE') {
-      return {
-        success: true,
-        message: 'User unfollowed successfully',
-      };
-    }
-
-    if (url.match(/\/users\/[\w-]+\/profile/)) {
-      return {
-        success: true,
-        data: {
-          ...mockUser,
-          id: url.match(/\/users\/([\w-]+)\//)[1],
-          courses: mockCourses.slice(0, 2),
-          badges: mockUser.badges,
-          friends: mockFriends,
-        },
-      };
-    }
-
-    if (url.includes('/achievements')) {
-      return {
-        success: true,
-        data: {
-          achievements: mockUser.badges,
-          recentlyEarned: mockUser.badges.filter((b) => b.earned),
-          progress: {
-            total: 50,
-            earned: 2,
-            remaining: 48,
-          },
-        },
-      };
-    }
-
-    // Trending
-    if (url.includes('/trending')) {
-      return {
-        success: true,
-        data: {
-          trending: mockCourses.slice(0, 6),
-        },
-      };
-    }
-
-    // Default response
-    return {
-      success: false,
-      error: 'Endpoint not found',
-      message: 'Mock endpoint not implemented',
-    };
+/**
+ * API Error class for structured error handling
+ */
+class ApiError extends Error {
+  constructor(message, status, data = null) {
+    super(message);
+    this.name = 'ApiError';
+    this.status = status;
+    this.data = data;
   }
 }
 
-const apiClient = new MockApiClient();
+/**
+ * HTTP Client using native Fetch API
+ * Handles authentication, error handling, and response parsing
+ */
+class HttpClient {
+  async request(url, options = {}) {
+    const token = getAuthToken();
 
-// API Service Methods
+    // Build headers
+    const headers = {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    };
+
+    // Add Authorization header if token exists
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    // Build fetch options
+    const fetchOptions = {
+      ...options,
+      headers,
+    };
+
+    // Log request in development
+    if (import.meta.env.VITE_DEBUG === 'true') {
+      console.log(`[API] ${options.method || 'GET'} ${url}`, {
+        body: options.body ? JSON.parse(options.body) : null,
+        headers,
+      });
+    }
+
+    try {
+      const response = await fetch(url, fetchOptions);
+
+      // Log response in development
+      if (import.meta.env.VITE_DEBUG === 'true') {
+        console.log(`[API] Response ${response.status}`, url);
+      }
+
+      // Handle non-JSON responses (like 204 No Content)
+      if (response.status === 204) {
+        return { success: true };
+      }
+
+      // Parse JSON response
+      const data = await response.json();
+
+      // Handle error responses
+      if (!response.ok) {
+        // Handle 401 Unauthorized - token expired or invalid
+        if (response.status === 401) {
+          removeAuthToken();
+          // Optionally redirect to login
+          if (window.location.pathname !== '/login') {
+            window.location.href = '/login';
+          }
+        }
+
+        // Throw structured error
+        throw new ApiError(
+          data.message || data.error || `HTTP ${response.status}`,
+          response.status,
+          data
+        );
+      }
+
+      // Return successful response
+      // Backend returns different formats, normalize to { success: true, data: ... }
+      if (data.token && data.user) {
+        // Auth responses
+        return { success: true, data, message: 'Success' };
+      }
+
+      // Most responses - wrap in success structure
+      return { success: true, data, message: data.message || 'Success' };
+
+    } catch (error) {
+      // Handle network errors (no response)
+      if (error instanceof ApiError) {
+        throw error;
+      }
+
+      // Network or parsing errors
+      console.error(`[API] Error: ${error.message}`, url);
+      throw new ApiError(
+        'Network error. Please check your connection.',
+        0,
+        { originalError: error.message }
+      );
+    }
+  }
+
+  async get(url, options = {}) {
+    return this.request(url, {
+      ...options,
+      method: 'GET',
+    });
+  }
+
+  async post(url, data, options = {}) {
+    return this.request(url, {
+      ...options,
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async patch(url, data, options = {}) {
+    return this.request(url, {
+      ...options,
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async delete(url, options = {}) {
+    return this.request(url, {
+      ...options,
+      method: 'DELETE',
+    });
+  }
+}
+
+// Create singleton instance
+const apiClient = new HttpClient();
+
+/**
+ * API Service Methods
+ * High-level API functions used throughout the application
+ */
 export const api = {
   // Auth
   register: async (email, password, username) => {
-    const response = await apiClient.post(buildUrl(API_ENDPOINTS.REGISTER), {
-      email,
-      password,
-      username,
-    });
-    if (response.success && response.data.token) {
-      setAuthToken(response.data.token);
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.user));
+    try {
+      const response = await apiClient.post(buildUrl(API_ENDPOINTS.REGISTER), {
+        email,
+        password,
+        username,
+      });
+
+      if (response.success && response.data.token) {
+        setAuthToken(response.data.token);
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.user));
+      }
+
+      return response;
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        message: error.message,
+      };
     }
-    return response;
   },
 
   login: async (email, password) => {
-    const response = await apiClient.post(buildUrl(API_ENDPOINTS.LOGIN), {
-      email,
-      password,
-    });
-    if (response.success && response.data.token) {
-      setAuthToken(response.data.token);
-      localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.user));
+    try {
+      const response = await apiClient.post(buildUrl(API_ENDPOINTS.LOGIN), {
+        email,
+        password,
+      });
+
+      if (response.success && response.data.token) {
+        setAuthToken(response.data.token);
+        localStorage.setItem(STORAGE_KEYS.USER, JSON.stringify(response.data.user));
+      }
+
+      return response;
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        message: error.message,
+      };
     }
-    return response;
   },
 
   logout: () => {
@@ -327,80 +228,207 @@ export const api = {
 
   // User/Identity
   getProfile: async () => {
-    return await apiClient.get(buildUrl(API_ENDPOINTS.ME));
+    try {
+      return await apiClient.get(buildUrl(API_ENDPOINTS.ME));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
   },
 
   updateProfile: async (data) => {
-    return await apiClient.patch(buildUrl(API_ENDPOINTS.UPDATE_PROFILE), data);
+    try {
+      return await apiClient.patch(buildUrl(API_ENDPOINTS.UPDATE_PROFILE), data);
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
   },
 
   completeOnboarding: async (onboardingData) => {
-    const response = await apiClient.post(buildUrl(API_ENDPOINTS.COMPLETE_ONBOARDING), onboardingData);
-    if (response.success) {
-      localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETE, 'true');
+    try {
+      const response = await apiClient.post(buildUrl(API_ENDPOINTS.COMPLETE_ONBOARDING), onboardingData);
+
+      if (response.success) {
+        localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETE, 'true');
+      }
+
+      return response;
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
     }
-    return response;
   },
 
   // Courses
   getCourses: async (filters = {}) => {
-    return await apiClient.get(buildUrl(API_ENDPOINTS.COURSES), { params: filters });
+    try {
+      const url = buildUrl(API_ENDPOINTS.COURSES);
+      // Add query params if provided
+      const queryParams = new URLSearchParams(filters).toString();
+      const fullUrl = queryParams ? `${url}?${queryParams}` : url;
+
+      return await apiClient.get(fullUrl);
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        data: { courses: [], total: 0 },
+      };
+    }
   },
 
   getCourseDetail: async (courseId) => {
-    return await apiClient.get(buildUrl(API_ENDPOINTS.COURSE_DETAIL, { id: courseId }));
+    try {
+      return await apiClient.get(buildUrl(API_ENDPOINTS.COURSE_DETAIL, { id: courseId }));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
   },
 
   getCourseProgress: async (courseId) => {
-    return await apiClient.get(buildUrl(API_ENDPOINTS.COURSE_PROGRESS, { id: courseId }));
+    try {
+      return await apiClient.get(buildUrl(API_ENDPOINTS.COURSE_PROGRESS, { id: courseId }));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        data: { progress: 0, completedModules: 0, totalModules: 0 },
+      };
+    }
   },
 
   // Exercises
   getExercise: async (exerciseId) => {
-    return await apiClient.get(buildUrl(API_ENDPOINTS.EXERCISE_DETAIL, { id: exerciseId }));
+    try {
+      return await apiClient.get(buildUrl(API_ENDPOINTS.EXERCISE_DETAIL, { id: exerciseId }));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
   },
 
   submitExercise: async (exerciseId, code, language) => {
-    return await apiClient.post(buildUrl(API_ENDPOINTS.SUBMIT_EXERCISE, { id: exerciseId }), {
-      code,
-      language,
-    });
+    try {
+      return await apiClient.post(buildUrl(API_ENDPOINTS.SUBMIT_EXERCISE, { id: exerciseId }), {
+        code,
+        language,
+      });
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        message: 'Failed to submit exercise',
+      };
+    }
   },
 
   requestReview: async (submissionId) => {
-    return await apiClient.post(buildUrl(API_ENDPOINTS.REQUEST_REVIEW, { id: submissionId }));
+    try {
+      return await apiClient.post(buildUrl(API_ENDPOINTS.REQUEST_REVIEW, { id: submissionId }));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
   },
 
   // Social
   getFeed: async (page = 1, limit = 20) => {
-    return await apiClient.get(buildUrl(API_ENDPOINTS.FEED), {
-      params: { page, limit },
-    });
+    try {
+      const url = buildUrl(API_ENDPOINTS.FEED);
+      const queryParams = new URLSearchParams({ page, limit }).toString();
+
+      return await apiClient.get(`${url}?${queryParams}`);
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        data: { activities: [], hasMore: false },
+      };
+    }
   },
 
   getRecommendations: async () => {
-    return await apiClient.get(buildUrl(API_ENDPOINTS.RECOMMENDATIONS));
+    try {
+      return await apiClient.get(buildUrl(API_ENDPOINTS.RECOMMENDATIONS));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        data: { recommendations: [], categories: [] },
+      };
+    }
   },
 
   followUser: async (userId) => {
-    return await apiClient.post(buildUrl(API_ENDPOINTS.FOLLOW_USER, { id: userId }));
+    try {
+      return await apiClient.post(buildUrl(API_ENDPOINTS.FOLLOW_USER, { id: userId }));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
   },
 
   unfollowUser: async (userId) => {
-    return await apiClient.delete(buildUrl(API_ENDPOINTS.UNFOLLOW_USER, { id: userId }));
+    try {
+      return await apiClient.delete(buildUrl(API_ENDPOINTS.UNFOLLOW_USER, { id: userId }));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
   },
 
   getUserProfile: async (userId) => {
-    return await apiClient.get(buildUrl(API_ENDPOINTS.USER_PROFILE, { id: userId }));
+    try {
+      return await apiClient.get(buildUrl(API_ENDPOINTS.USER_PROFILE, { id: userId }));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+      };
+    }
   },
 
   getAchievements: async () => {
-    return await apiClient.get(buildUrl(API_ENDPOINTS.ACHIEVEMENTS));
+    try {
+      return await apiClient.get(buildUrl(API_ENDPOINTS.ACHIEVEMENTS));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        data: { achievements: [], recentlyEarned: [], progress: { total: 0, earned: 0 } },
+      };
+    }
   },
 
   // Public
   getTrending: async () => {
-    return await apiClient.get(buildUrl(API_ENDPOINTS.TRENDING));
+    try {
+      return await apiClient.get(buildUrl(API_ENDPOINTS.TRENDING));
+    } catch (error) {
+      return {
+        success: false,
+        error: error.message,
+        data: { trending: [] },
+      };
+    }
   },
 };
 

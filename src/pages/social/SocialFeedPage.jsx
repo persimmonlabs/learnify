@@ -22,70 +22,48 @@ const SocialFeedPage = () => {
       try {
         const feedResponse = await api.getFeed();
 
-        // Use extended mock friends data
-        setAllFriends(mockFriends);
+        // Use real API data if available, fallback to mock
+        if (feedResponse.success && feedResponse.data.activities) {
+          setFriendActivity(feedResponse.data.activities);
+        } else {
+          // Fallback to mock data if API fails
+          const dataActivity = [
+            {
+              id: 'act-1',
+              user: { name: 'Sarah Chen', avatar: null },
+              type: 'optimization',
+              action: 'optimized algorithm complexity',
+              details: 'O(n²) → O(n) in Module 3',
+              score: 95,
+              timestamp: '2h ago',
+            },
+            {
+              id: 'act-2',
+              user: { name: 'Marcus Rivera', avatar: null },
+              type: 'completion',
+              action: 'passed Senior Review',
+              details: 'Architecture Score: 92%',
+              score: 92,
+              timestamp: '4h ago',
+            },
+          ];
+          setFriendActivity(dataActivity);
+        }
 
-        // Data-driven activity feed (Strava for Brains style)
-        const dataActivity = [
-          {
-            id: 'act-1',
-            user: { name: 'Sarah Chen', avatar: null },
-            type: 'optimization',
-            action: 'optimized algorithm complexity',
-            details: 'O(n²) → O(n) in Module 3',
-            score: 95,
-            timestamp: '2h ago',
-          },
-          {
-            id: 'act-2',
-            user: { name: 'Marcus Rivera', avatar: null },
-            type: 'completion',
-            action: 'passed Senior Review',
-            details: 'Architecture Score: 92%',
-            score: 92,
-            timestamp: '4h ago',
-          },
-          {
-            id: 'act-3',
-            user: { name: 'Priya Patel', avatar: null },
-            type: 'milestone',
-            action: 'completed The Allocator',
-            details: '6 days • 7 modules',
-            score: 88,
-            timestamp: '6h ago',
-          },
-          {
-            id: 'act-4',
-            user: { name: 'Jordan Kim', avatar: null },
-            type: 'optimization',
-            action: 'reduced memory usage',
-            details: '2GB → 512MB in Module 5',
-            score: 96,
-            timestamp: '8h ago',
-          },
-          {
-            id: 'act-5',
-            user: { name: 'Elena Volkov', avatar: null },
-            type: 'completion',
-            action: 'finished Market Mechanics',
-            details: 'All exercises passed',
-            score: 94,
-            timestamp: '12h ago',
-          },
-          {
-            id: 'act-6',
-            user: { name: 'Alex Thompson', avatar: null },
-            type: 'optimization',
-            action: 'refactored database queries',
-            details: '120ms → 15ms average',
-            score: 97,
-            timestamp: '1d ago',
-          },
-        ];
-
-        setFriendActivity(dataActivity);
+        // Fetch recommendations for friends
+        const recsResponse = await api.getRecommendations();
+        if (recsResponse.success && recsResponse.data.recommendations) {
+          // Map recommendations to friends format if needed
+          // For now, fallback to mock friends
+          setAllFriends(mockFriends);
+        } else {
+          setAllFriends(mockFriends);
+        }
       } catch (error) {
         console.error('Failed to fetch social data:', error);
+        // Use mock data on error
+        setAllFriends(mockFriends);
+        setFriendActivity([]);
       } finally {
         setLoading(false);
       }

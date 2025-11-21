@@ -37,15 +37,21 @@ const ExercisePage = () => {
     navigate(-1);
   };
 
-  const handleSubmit = async () => {
+  const handleSubmit = async (code, language) => {
     try {
-      const response = await api.submitExercise(exerciseId, 'sample code', 'python');
+      // Use actual code from editor, not hardcoded sample
+      const response = await api.submitExercise(exerciseId, code, language);
 
       if (response.success) {
-        alert('Solution submitted! Score: ' + response.data.score + '%');
+        const score = response.data.score || 0;
+        const feedback = response.data.feedback || 'Submission received';
+        alert(`Solution submitted! Score: ${score}%\n${feedback}`);
+      } else {
+        alert(`Submission failed: ${response.error || 'Unknown error'}`);
       }
     } catch (error) {
       console.error('Failed to submit exercise:', error);
+      alert('Failed to submit solution. Please try again.');
     }
   };
 
